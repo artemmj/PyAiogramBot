@@ -3,6 +3,9 @@ import asyncio
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from handlers.start import start_router
+from handlers.faq import faq_router
+from handlers.edit_msg import edit_msg_router
+from handlers.send import send_files_router
 from settings import dp, bot
 
 
@@ -24,6 +27,9 @@ async def main():
     # Добавляем роутер start_router в диспетчер. Это позволяет диспетчеру
     # знать о всех обработчиках команд, которые определены в start_router
     dp.include_router(start_router)
+    dp.include_router(faq_router)
+    dp.include_router(edit_msg_router)
+    dp.include_router(send_files_router)
     await bot.delete_webhook(drop_pending_updates=True)
 
     # Запускаем бота в режиме опроса (polling). Бот начинает непрерывно

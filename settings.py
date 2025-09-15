@@ -1,4 +1,5 @@
 import logging
+import os
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -19,10 +20,11 @@ dp = Dispatcher(storage=MemoryStorage())  # для хранения состоя
 admins = [int(admin_id) for admin_id in config('ADMINS').split(',')]
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 
 # from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+
+media_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'media')
 
 questions = {
     1: {'qst': 'Столица Италии?', 'answer': 'Рим'},
