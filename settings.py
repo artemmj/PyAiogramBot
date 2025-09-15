@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 
 from decouple import config
 
@@ -12,10 +13,13 @@ bot = Bot(
     token=config('TOKEN'),
     default=DefaultBotProperties(parse_mode=ParseMode.HTML),  # чтобы бот мог воспринимать html разметку
 )
+
+redis_storage = RedisStorage.from_url(config('REDIS_URL'))
+
 # Основной объект, отвечающий за обработку входящих сообщений и других
 # обновлений, поступающих от Telegram. Именно через диспетчер проходят
 # все сообщения и команды, отправляемые пользователями бота.
-dp = Dispatcher(storage=MemoryStorage())  # для хранения состояния конечных автоматов FSM используется RAM
+dp = Dispatcher(storage=redis_storage)
 
 admins = [int(admin_id) for admin_id in config('ADMINS').split(',')]
 

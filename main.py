@@ -6,6 +6,7 @@ from handlers.start import start_router
 from handlers.faq import faq_router
 from handlers.edit_msg import edit_msg_router
 from handlers.send import send_files_router
+from handlers.questionnaire import questionnaire_router
 from settings import dp, bot
 
 
@@ -30,6 +31,7 @@ async def main():
     dp.include_router(faq_router)
     dp.include_router(edit_msg_router)
     dp.include_router(send_files_router)
+    dp.include_router(questionnaire_router)
     await bot.delete_webhook(drop_pending_updates=True)
 
     # Запускаем бота в режиме опроса (polling). Бот начинает непрерывно
