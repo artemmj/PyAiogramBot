@@ -81,7 +81,7 @@ async def send_video(message: Message, state: FSMContext):
 
 
 @send_files_router.message(Command('send_voice'))
-async def cmd_start(message: Message, state: FSMContext):
+async def send_voice(message: Message, state: FSMContext):
     async with ChatActionSender.record_voice(bot=bot, chat_id=message.from_user.id):
         await asyncio.sleep(2)
         await message.answer_voice(
@@ -90,7 +90,7 @@ async def cmd_start(message: Message, state: FSMContext):
 
 
 @send_files_router.message(Command('send_video_note'))
-async def cmd_start(message: Message, state: FSMContext):
+async def send_video_note(message: Message, state: FSMContext):
     async with ChatActionSender.record_video_note(bot=bot, chat_id=message.from_user.id):
         await asyncio.sleep(1)
         await message.answer_video_note(
@@ -99,7 +99,7 @@ async def cmd_start(message: Message, state: FSMContext):
 
 
 @send_files_router.message(Command('send_media_group'))
-async def cmd_start(message: Message, state: FSMContext):
+async def send_media_group(message: Message, state: FSMContext):
     photo_1 = InputMediaPhoto(
         type='photo',
         media=FSInputFile(path=os.path.join(media_dir, '1.png')),
