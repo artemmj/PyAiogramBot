@@ -18,7 +18,8 @@ start_router = Router()
 
 
 @start_router.message(CommandStart())  # срабатывает на команду /start
-async def cmd_start(message: Message, command: CommandObject):
+async def cmd_start(message: Message, command: CommandObject, state: FSMContext):
+    await state.clear()  # Сбросить состояние
     command_arg: str = command.args  # извлекаем метку-аргумент команды
     user_id = message.from_user.id
 
@@ -30,7 +31,8 @@ async def cmd_start(message: Message, command: CommandObject):
 
 
 @start_router.message(Command('start2'))  # активируется при любой команде, переданной аргументом
-async def cmd_start_2(message: Message):
+async def cmd_start_2(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(
         'Запуск сообщения по команде /start2',
         reply_markup=spec_kb(),
@@ -51,7 +53,8 @@ async def cmd_start_2(message: Message):
 # F.text.regexp(r'(?i)^Привет, .+')
 
 @start_router.message(F.text == '/start3')  # позволяет фильтровать сообщения по содержимому текста
-async def cmd_start_3(message: Message):
+async def cmd_start_3(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(
         'Запуск сообщения по команде /start3',
         reply_markup=ease_link_inline_kb(),
@@ -59,11 +62,13 @@ async def cmd_start_3(message: Message):
 
 
 @start_router.callback_query(F.data == 'back_home')
-async def back_home(call: CallbackQuery):
+async def back_home(call: CallbackQuery, state: FSMContext):
+    await state.clear()
     await call.message.answer(
         'Возвращаю в главное меню',
         reply_markup=main_kb(call.message.from_user.id),
     )
+
 
 @start_router.message(F.text == 'Давай инлайн!')
 async def get_inline_btn_link(message: Message):
