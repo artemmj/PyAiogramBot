@@ -5,10 +5,13 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import CallbackQuery, Message
 
-from settings import admins, bot
-from filters.is_admin import IsAdmin
+from database import get_user_data
 from keyboards.all_kbs import main_kb, spec_kb
 from keyboards.inline_kbs import get_inline_kb, ease_link_inline_kb
+from keyboards.questionnaire import gender_kb
+from handlers.questionnaire import Form
+from settings import admins, bot
+from filters.is_admin import IsAdmin
 from utils.gen_random_person import gen_random_person
 from utils.get_msk_time import get_msc_date
 
@@ -23,11 +26,14 @@ async def cmd_start(message: Message, command: CommandObject, state: FSMContext)
     command_arg: str = command.args  # извлекаем метку-аргумент команды
     user_id = message.from_user.id
 
-    omsg = 'Запуск сообщения по команде /start'
-    if command_arg:
-        await message.answer(f'{omsg} с меткой <code>{command_arg}</code>', reply_markup=main_kb(user_id))
+    user_info = await get_user_data(user_id=message.from_user.id)
+    if user_info:
+        await message.answer(
+            'Привет. Вижу, ты зарегистрирован, и значит тебе можно посмотреть, как выглядит твой профиль',
+            reply_markup=main_kb(message.from_user.id))
     else:
-        await message.answer(f'{omsg} без метки', reply_markup=main_kb(user_id))
+        await message.answer('Привет. Для начала выбери свой пол:', reply_markup=gender_kb())
+        await state.set_state(Form.gender)
 
 
 @start_router.message(Command('start2'))  # активируется при любой команде, переданной аргументом
@@ -139,3 +145,21 @@ async def cmd_start(message: Message, state: FSMContext):
         'date': get_msc_date(message.date),
     }
     print(data_task)
+
+
+@start_router.message(F.text.contains('Профиль'))
+async def start_profile(message: Message, state: FSMContext):
+    async with ChatActionSender.typing(bot=bot, chat_id=message.chat.id):
+        user_info = await get_user_data(user_id=message.from_user.id)
+        profile_message = (
+            f"<b>👤 Профиль пользователя:</b>\n"
+            f"<b>🆔 ID:</b> {user_info['user_id']}\n"
+            f"<b>💼 Логин:</b> @{user_info['user_login']}\n"
+            f"<b>📛 Полное имя:</b> {user_info['full_name']}\n"
+            f"<b>🧑‍🦰 Пол:</b> {user_info['gender']}\n"
+            f"<b>🎂 Возраст:</b> {user_info['age']}\n"
+            f"<b>📅 Дата регистрации:</b> {user_info['date_reg']}\n"
+            f"<b>📝 О себе:</b> {user_info['about']}\n"
+        )
+
+        await message.answer_photo(photo=user_info.get('photo'), caption=profile_message)

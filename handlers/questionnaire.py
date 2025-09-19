@@ -14,6 +14,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 # from aiogram.utils.chat_action import ChatActionSender
 
+from database import insert_user
 from keyboards.questionnaire import check_data, gender_kb, get_login_tg
 from settings import bot
 
@@ -151,7 +152,11 @@ async def start_questionnaire_process(message: Message, state: FSMContext):
 # сохраняем данные
 @questionnaire_router.callback_query(F.data == 'correct', Form.check_state)
 async def start_questionnaire_process(call: CallbackQuery, state: FSMContext):
-    await call.answer('Данные сохранены')
+    await call.answer('Данные cохраняются...')
+
+    user_data = await state.get_data()  # Забрали данные из хранилища FSM
+    await insert_user(user_data)        # INSERT БД операция добавления пользователя
+
     await call.message.edit_reply_markup(reply_markup=None)
     await call.message.answer('Благодарю за регистрацию. Ваши данные успешно сохранены!')
     await state.clear()

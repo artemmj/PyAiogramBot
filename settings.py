@@ -6,7 +6,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
-
+from asyncpg_lite import DatabaseManager
 from decouple import config
 
 bot = Bot(
@@ -14,12 +14,14 @@ bot = Bot(
     default=DefaultBotProperties(parse_mode=ParseMode.HTML),  # чтобы бот мог воспринимать html разметку
 )
 
+pg_manager = DatabaseManager(db_url=config('DATABASE_STR'), deletion_password=config('ROOT_PASS'))
+
 redis_storage = RedisStorage.from_url(config('REDIS_URL'))
 
 # Основной объект, отвечающий за обработку входящих сообщений и других
 # обновлений, поступающих от Telegram. Именно через диспетчер проходят
 # все сообщения и команды, отправляемые пользователями бота.
-dp = Dispatcher(storage=redis_storage)
+dp = Dispatcher(storage=MemoryStorage())
 
 admins = [int(admin_id) for admin_id in config('ADMINS').split(',')]
 
