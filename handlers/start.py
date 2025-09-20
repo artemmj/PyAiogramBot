@@ -147,7 +147,7 @@ async def cmd_start(message: Message, state: FSMContext):
     print(data_task)
 
 
-@start_router.message(F.text.contains('Профиль'))
+@start_router.message(F.text.contains('ППрофиль'))
 async def start_profile(message: Message, state: FSMContext):
     async with ChatActionSender.typing(bot=bot, chat_id=message.chat.id):
         user_info = await get_user_data(user_id=message.from_user.id)

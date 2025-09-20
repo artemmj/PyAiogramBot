@@ -2,21 +2,19 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, KeyboardButtonPol
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from decouple import config
 
+from settings import admins
+
 
 def main_kb(user_telegram_id: int):
     """
     Функция возвращает созданную клавиатуру, которую мы привязываем к сообщению.
     """
-    kb_list = [  # cоздание списка кнопок:
+    kb_list = [
         [
             KeyboardButton(text="Узнать погоду"),
-            KeyboardButton(text="👤 Профиль"),
+            KeyboardButton(text="👤 Мой профиль"),
             KeyboardButton(text="Давай инлайн!"),
         ],
-        # [
-        #     KeyboardButton(text="📝 Заполнить анкету"),
-        #     KeyboardButton(text="📚 Каталог"),
-        # ],
     ]
 
     # Создание админской кнопки, если админ
@@ -30,6 +28,18 @@ def main_kb(user_telegram_id: int):
         # input_field_placeholder=''  # заменяет стандартную подпись на пользовательскую
     )
     return keyboard
+
+
+def home_page_kb(user_telegram_id: int):
+    kb_list = [[KeyboardButton(text="🔙 Назад")]]
+    if user_telegram_id in admins:
+        kb_list.append([KeyboardButton(text="⚙️ Админ панель")])
+    return ReplyKeyboardMarkup(
+        keyboard=kb_list,
+        resize_keyboard=True,
+        one_time_keyboard=True,
+        input_field_placeholder="Воспользуйтесь меню:"
+    )
 
 
 def spec_kb():
